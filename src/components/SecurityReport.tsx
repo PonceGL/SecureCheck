@@ -3,7 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Cookie, Lock, Globe, ExternalLink, Info } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Lock, ExternalLink, Info, Camera } from 'lucide-react';
+import { ReportDialog } from '@/components/ReportDialog';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface SecurityReportProps {
   report: {
@@ -44,6 +46,8 @@ interface SecurityReportProps {
 }
 
 export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
+  const { t } = useLanguage();
+  
   const getRiskColor = (level: string) => {
     switch (level) {
       case 'LOW': return 'text-green-400 bg-green-400/20';
@@ -61,6 +65,14 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
     return 'text-red-400';
   };
 
+  // Generate screenshot URL - using a service like htmlcsstoimage or similar
+  const getScreenshotUrl = (url: string) => {
+    // In a real implementation, you would use a screenshot service API
+    // For demo purposes, we'll use a placeholder service
+    const encodedUrl = encodeURIComponent(url);
+    return `https://api.screenshotmachine.com/?key=demo&url=${encodedUrl}&dimension=1024x768`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Overall Security Score */}
@@ -73,18 +85,21 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
               ) : (
                 <XCircle className="h-6 w-6 text-red-400" />
               )}
-              Security Analysis Report
+              {t('securityAnalysis')}
             </div>
-            <Badge className={getRiskColor(report.riskLevel)}>
-              {report.riskLevel} RISK
-            </Badge>
+            <div className="flex items-center gap-3">
+              <Badge className={getRiskColor(report.riskLevel)}>
+                {report.riskLevel} RISK
+              </Badge>
+              <ReportDialog url={report.url} />
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-slate-300">Security Score</span>
+                <span className="text-slate-300">{t('securityScore')}</span>
                 <span className={`font-bold ${getScoreColor(report.overallScore)}`}>
                   {report.overallScore}/100
                 </span>
@@ -92,11 +107,39 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
               <Progress value={report.overallScore} className="h-3" />
             </div>
             <div className="text-right">
-              <div className="text-sm text-slate-400">Analyzed URL</div>
+              <div className="text-sm text-slate-400">{t('analyzedUrl')}</div>
               <div className="text-white font-mono text-sm flex items-center gap-2">
                 {report.url}
                 <ExternalLink className="h-4 w-4 text-slate-400" />
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Website Screenshot */}
+      <Card className="bg-slate-800 border-slate-700">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Camera className="h-6 w-6 text-blue-400" />
+            {t('websiteScreenshot')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            <img
+              src={getScreenshotUrl(report.url)}
+              alt={`Screenshot of ${report.url}`}
+              className="w-full max-w-2xl mx-auto rounded-lg border border-slate-600"
+              onError={(e) => {
+                // Fallback to placeholder if screenshot service fails
+                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23374151'/%3E%3Ctext x='400' y='300' text-anchor='middle' fill='%23D1D5DB' font-family='Arial' font-size='18'%3EScreenshot not available%3C/text%3E%3C/svg%3E";
+              }}
+            />
+            <div className="absolute top-2 right-2">
+              <Badge className="bg-slate-700 text-slate-300">
+                Live Preview
+              </Badge>
             </div>
           </div>
         </CardContent>
@@ -107,62 +150,62 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <AlertTriangle className="h-6 w-6 text-yellow-400" />
-            Threat Detection
+            {t('threatDetection')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
-              <span className="text-slate-300">Malware Detection</span>
+              <span className="text-slate-300">{t('malwareDetection')}</span>
               {report.threats.malware.detected ? (
-                <Badge className="text-red-400 bg-red-400/20">DETECTED</Badge>
+                <Badge className="text-red-400 bg-red-400/20">{t('detected')}</Badge>
               ) : (
-                <Badge className="text-green-400 bg-green-400/20">CLEAN</Badge>
+                <Badge className="text-green-400 bg-green-400/20">{t('clean')}</Badge>
               )}
             </div>
             
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
-              <span className="text-slate-300">Phishing Attempt</span>
+              <span className="text-slate-300">{t('phishingAttempt')}</span>
               {report.threats.phishing.detected ? (
-                <Badge className="text-red-400 bg-red-400/20">DETECTED</Badge>
+                <Badge className="text-red-400 bg-red-400/20">{t('detected')}</Badge>
               ) : (
-                <Badge className="text-green-400 bg-green-400/20">SAFE</Badge>
+                <Badge className="text-green-400 bg-green-400/20">{t('safe')}</Badge>
               )}
             </div>
             
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
-              <span className="text-slate-300">Data Theft Risk</span>
+              <span className="text-slate-300">{t('dataTheftRisk')}</span>
               {report.threats.dataTheft.detected ? (
-                <Badge className="text-red-400 bg-red-400/20">HIGH RISK</Badge>
+                <Badge className="text-red-400 bg-red-400/20">{t('highRisk')}</Badge>
               ) : (
-                <Badge className="text-green-400 bg-green-400/20">LOW RISK</Badge>
+                <Badge className="text-green-400 bg-green-400/20">{t('lowRisk')}</Badge>
               )}
             </div>
             
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
-              <span className="text-slate-300">Malicious Cookies</span>
+              <span className="text-slate-300">{t('maliciousCookies')}</span>
               {report.threats.maliciousCookies.detected ? (
-                <Badge className="text-red-400 bg-red-400/20">FOUND</Badge>
+                <Badge className="text-red-400 bg-red-400/20">{t('found')}</Badge>
               ) : (
-                <Badge className="text-green-400 bg-green-400/20">NONE</Badge>
+                <Badge className="text-green-400 bg-green-400/20">{t('none')}</Badge>
               )}
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* SSL/TLS Security */}
+      {/* SSL/TLS Security and Privacy Analysis */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Lock className="h-6 w-6 text-blue-400" />
-              SSL/TLS Security
+              {t('sslSecurity')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">SSL Enabled</span>
+              <span className="text-slate-300">{t('sslEnabled')}</span>
               {report.ssl.enabled ? (
                 <CheckCircle className="h-5 w-5 text-green-400" />
               ) : (
@@ -170,7 +213,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
               )}
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">Certificate Valid</span>
+              <span className="text-slate-300">{t('certificateValid')}</span>
               {report.ssl.valid ? (
                 <CheckCircle className="h-5 w-5 text-green-400" />
               ) : (
@@ -178,7 +221,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
               )}
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">SSL Grade</span>
+              <span className="text-slate-300">{t('sslGrade')}</span>
               <Badge className={report.ssl.grade === 'A+' ? 'text-green-400 bg-green-400/20' : 'text-yellow-400 bg-yellow-400/20'}>
                 {report.ssl.grade}
               </Badge>
@@ -190,24 +233,24 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Eye className="h-6 w-6 text-purple-400" />
-              Privacy Analysis
+              {t('privacyAnalysis')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">Trackers Found</span>
+              <span className="text-slate-300">{t('trackersFound')}</span>
               <Badge className={report.privacy.trackers > 5 ? 'text-red-400 bg-red-400/20' : 'text-green-400 bg-green-400/20'}>
                 {report.privacy.trackers}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-300">Cookies</span>
+              <span className="text-slate-300">{t('cookies')}</span>
               <Badge className="text-blue-400 bg-blue-400/20">
                 {report.privacy.cookieCount}
               </Badge>
             </div>
             <div className="space-y-1">
-              <span className="text-slate-300 text-sm">Data Collection:</span>
+              <span className="text-slate-300 text-sm">{t('dataCollection')}</span>
               <div className="flex flex-wrap gap-1">
                 {report.privacy.dataCollection.map((item, index) => (
                   <Badge key={index} variant="outline" className="text-xs text-slate-400 border-slate-600">
@@ -226,7 +269,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
               <Info className="h-6 w-6 text-blue-400" />
-              Detailed Security Analysis
+              {t('detailedAnalysis')}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Cookie, Lock, Globe } from 'lucide-react';
+import { Shield, Eye, Cookie, Lock } from 'lucide-react';
 import { SecurityReport } from '@/components/SecurityReport';
+import { EducationalSection } from '@/components/EducationalSection';
 import { analyzeUrlSecurity } from '@/utils/securityAnalyzer';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export const SecurityAnalyzer = () => {
   const [url, setUrl] = useState('');
@@ -16,6 +17,7 @@ export const SecurityAnalyzer = () => {
   const [progress, setProgress] = useState(0);
   const [report, setReport] = useState(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleAnalyze = async () => {
     if (!url) {
@@ -63,7 +65,7 @@ export const SecurityAnalyzer = () => {
         setIsAnalyzing(false);
         
         toast({
-          title: "Analysis Complete",
+          title: t('analysisComplete'),
           description: `Security scan completed for ${url}`,
         });
       }, 500);
@@ -74,7 +76,7 @@ export const SecurityAnalyzer = () => {
       setProgress(0);
       
       toast({
-        title: "Analysis Failed",
+        title: t('analysisFailed'),
         description: "Unable to complete security analysis. Please try again.",
         variant: "destructive",
       });
@@ -88,14 +90,14 @@ export const SecurityAnalyzer = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Shield className="h-6 w-6 text-blue-400" />
-            URL Security Analysis
+            {t('securityAnalysis')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             <Input
               type="url"
-              placeholder="Enter URL to analyze (e.g., https://example.com)"
+              placeholder={t('enterUrl')}
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400"
@@ -106,7 +108,7 @@ export const SecurityAnalyzer = () => {
               disabled={isAnalyzing}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8"
             >
-              {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+              {isAnalyzing ? t('analyzing') : t('analyze')}
             </Button>
           </div>
           
@@ -127,7 +129,7 @@ export const SecurityAnalyzer = () => {
         <Card className="bg-slate-800 border-slate-700">
           <CardContent className="p-6 text-center">
             <Shield className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">Malware Detection</h3>
+            <h3 className="font-semibold text-white mb-1">{t('malwareDetection')}</h3>
             <p className="text-sm text-slate-400">Scans for malicious scripts and downloads</p>
           </CardContent>
         </Card>
@@ -135,7 +137,7 @@ export const SecurityAnalyzer = () => {
         <Card className="bg-slate-800 border-slate-700">
           <CardContent className="p-6 text-center">
             <Eye className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">Privacy Analysis</h3>
+            <h3 className="font-semibold text-white mb-1">{t('privacyAnalysis')}</h3>
             <p className="text-sm text-slate-400">Checks for data tracking and collection</p>
           </CardContent>
         </Card>
@@ -159,6 +161,9 @@ export const SecurityAnalyzer = () => {
 
       {/* Security Report */}
       {report && <SecurityReport report={report} />}
+      
+      {/* Educational Section */}
+      <EducationalSection />
     </div>
   );
 };
