@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Cookie, Lock, Globe, ExternalLink } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Cookie, Lock, Globe, ExternalLink, Info } from 'lucide-react';
 
 interface SecurityReportProps {
   report: {
@@ -12,11 +12,11 @@ interface SecurityReportProps {
     riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     isSecure: boolean;
     threats: {
-      malware: boolean;
-      phishing: boolean;
-      dataTheft: boolean;
-      maliciousCookies: boolean;
-      unsafeDownloads: boolean;
+      malware: { detected: boolean; details?: any };
+      phishing: { detected: boolean; details?: any };
+      dataTheft: { detected: boolean; details?: any };
+      maliciousCookies: { detected: boolean; details?: any };
+      unsafeDownloads: { detected: boolean; details?: any };
     };
     ssl: {
       enabled: boolean;
@@ -33,6 +33,12 @@ interface SecurityReportProps {
       issue: string;
       severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
       description: string;
+      explanation?: string;
+      risks?: string[];
+      targetedInfo?: string[];
+      consequences?: string;
+      dataCollected?: string[];
+      impact?: string;
     }[];
   };
 }
@@ -108,7 +114,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
               <span className="text-slate-300">Malware Detection</span>
-              {report.threats.malware ? (
+              {report.threats.malware.detected ? (
                 <Badge className="text-red-400 bg-red-400/20">DETECTED</Badge>
               ) : (
                 <Badge className="text-green-400 bg-green-400/20">CLEAN</Badge>
@@ -117,7 +123,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
             
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
               <span className="text-slate-300">Phishing Attempt</span>
-              {report.threats.phishing ? (
+              {report.threats.phishing.detected ? (
                 <Badge className="text-red-400 bg-red-400/20">DETECTED</Badge>
               ) : (
                 <Badge className="text-green-400 bg-green-400/20">SAFE</Badge>
@@ -126,7 +132,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
             
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
               <span className="text-slate-300">Data Theft Risk</span>
-              {report.threats.dataTheft ? (
+              {report.threats.dataTheft.detected ? (
                 <Badge className="text-red-400 bg-red-400/20">HIGH RISK</Badge>
               ) : (
                 <Badge className="text-green-400 bg-green-400/20">LOW RISK</Badge>
@@ -135,7 +141,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
             
             <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
               <span className="text-slate-300">Malicious Cookies</span>
-              {report.threats.maliciousCookies ? (
+              {report.threats.maliciousCookies.detected ? (
                 <Badge className="text-red-400 bg-red-400/20">FOUND</Badge>
               ) : (
                 <Badge className="text-green-400 bg-green-400/20">NONE</Badge>
@@ -214,27 +220,83 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
         </Card>
       </div>
 
-      {/* Detailed Issues */}
+      {/* Detailed Security Issues */}
       {report.details.length > 0 && (
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-white">
-              <AlertTriangle className="h-6 w-6 text-orange-400" />
-              Detailed Security Issues
+              <Info className="h-6 w-6 text-blue-400" />
+              Detailed Security Analysis
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {report.details.map((detail, index) => (
-                <div key={index} className="p-4 bg-slate-700 rounded-lg border-l-4 border-orange-400">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-white">{detail.issue}</h4>
+                <div key={index} className="p-6 bg-slate-700 rounded-lg border-l-4 border-orange-400">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-white text-lg">{detail.issue}</h4>
                     <Badge className={getRiskColor(detail.severity)}>
                       {detail.severity}
                     </Badge>
                   </div>
-                  <p className="text-slate-300 text-sm mb-1">{detail.description}</p>
-                  <p className="text-slate-400 text-xs">Category: {detail.category}</p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <h5 className="text-sm font-medium text-slate-300 mb-2">What this means:</h5>
+                      <p className="text-slate-200 text-sm leading-relaxed">{detail.description}</p>
+                    </div>
+                    
+                    {detail.explanation && (
+                      <div>
+                        <h5 className="text-sm font-medium text-slate-300 mb-2">Why this matters:</h5>
+                        <p className="text-slate-200 text-sm leading-relaxed">{detail.explanation}</p>
+                      </div>
+                    )}
+                    
+                    {detail.risks && detail.risks.length > 0 && (
+                      <div>
+                        <h5 className="text-sm font-medium text-slate-300 mb-2">Potential risks:</h5>
+                        <ul className="list-disc list-inside text-slate-200 text-sm space-y-1">
+                          {detail.risks.map((risk, riskIndex) => (
+                            <li key={riskIndex}>{risk}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {detail.targetedInfo && detail.targetedInfo.length > 0 && (
+                      <div>
+                        <h5 className="text-sm font-medium text-slate-300 mb-2">Information being targeted:</h5>
+                        <ul className="list-disc list-inside text-slate-200 text-sm space-y-1">
+                          {detail.targetedInfo.map((info, infoIndex) => (
+                            <li key={infoIndex}>{info}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {detail.dataCollected && detail.dataCollected.length > 0 && (
+                      <div>
+                        <h5 className="text-sm font-medium text-slate-300 mb-2">Data being collected:</h5>
+                        <ul className="list-disc list-inside text-slate-200 text-sm space-y-1">
+                          {detail.dataCollected.map((data, dataIndex) => (
+                            <li key={dataIndex}>{data}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {detail.consequences && (
+                      <div>
+                        <h5 className="text-sm font-medium text-slate-300 mb-2">What could happen:</h5>
+                        <p className="text-slate-200 text-sm leading-relaxed">{detail.consequences}</p>
+                      </div>
+                    )}
+                    
+                    <div className="pt-2 border-t border-slate-600">
+                      <p className="text-slate-400 text-xs">Category: {detail.category}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
