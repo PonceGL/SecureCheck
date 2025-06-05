@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,79 @@ export const SecurityAnalyzer = () => {
   const [report, setReport] = useState(null);
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  // Analytics tracking
+  useEffect(() => {
+    // Track page visit
+    trackAnalytics();
+    
+    // Track time spent on site
+    const startTime = Date.now();
+    
+    return () => {
+      const timeSpent = Date.now() - startTime;
+      trackEvent('session_duration', { duration: timeSpent });
+    };
+  }, []);
+
+  const trackAnalytics = () => {
+    const analytics = {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      deviceType: getDeviceType(),
+      browser: getBrowser(),
+      userId: getUserId(),
+      referrer: document.referrer,
+      url: window.location.href,
+      event: 'page_visit'
+    };
+
+    // Store in localStorage for now (in production, send to analytics service)
+    const storedAnalytics = JSON.parse(localStorage.getItem('securecheck_analytics') || '[]');
+    storedAnalytics.push(analytics);
+    localStorage.setItem('securecheck_analytics', JSON.stringify(storedAnalytics));
+    
+    console.log('Analytics tracked:', analytics);
+  };
+
+  const trackEvent = (event: string, data: any = {}) => {
+    const analytics = {
+      timestamp: new Date().toISOString(),
+      userId: getUserId(),
+      event,
+      data,
+      url: window.location.href
+    };
+
+    const storedAnalytics = JSON.parse(localStorage.getItem('securecheck_analytics') || '[]');
+    storedAnalytics.push(analytics);
+    localStorage.setItem('securecheck_analytics', JSON.stringify(storedAnalytics));
+  };
+
+  const getDeviceType = () => {
+    const userAgent = navigator.userAgent;
+    if (/tablet|ipad|playbook|silk/i.test(userAgent)) return 'tablet';
+    if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(userAgent)) return 'mobile';
+    return 'desktop';
+  };
+
+  const getBrowser = () => {
+    const userAgent = navigator.userAgent;
+    if (userAgent.includes('Chrome')) return 'Chrome';
+    if (userAgent.includes('Firefox')) return 'Firefox';
+    if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) return 'Safari';
+    if (userAgent.includes('Edge')) return 'Edge';
+    return 'Other';
+  };
+
+  const getUserId = () => {
+    let userId = localStorage.getItem('securecheck_user_id');
+    if (!userId) {
+      userId = 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+      localStorage.setItem('securecheck_user_id', userId);
+    }
+    return userId;
+  };
 
   const handleAnalyze = async () => {
     if (!url) {
@@ -39,6 +112,8 @@ export const SecurityAnalyzer = () => {
       });
       return;
     }
+
+    trackEvent('analysis_started', { url });
 
     setIsAnalyzing(true);
     setProgress(0);
@@ -64,6 +139,12 @@ export const SecurityAnalyzer = () => {
         setReport(analysisResult);
         setIsAnalyzing(false);
         
+        trackEvent('analysis_completed', { 
+          url, 
+          score: analysisResult.overallScore,
+          riskLevel: analysisResult.riskLevel 
+        });
+        
         toast({
           title: t('analysisComplete'),
           description: `Security scan completed for ${url}`,
@@ -75,12 +156,26 @@ export const SecurityAnalyzer = () => {
       setIsAnalyzing(false);
       setProgress(0);
       
+      trackEvent('analysis_failed', { url, error: error.message });
+      
       toast({
         title: t('analysisFailed'),
         description: "Unable to complete security analysis. Please try again.",
         variant: "destructive",
       });
     }
+  };
+
+  const handleAnalyzeNew = () => {
+    setUrl('');
+    setReport(null);
+    setProgress(0);
+    trackEvent('analyze_new_clicked');
+  };
+
+  // Track clicks
+  const handleClick = (element: string) => {
+    trackEvent('click', { element });
   };
 
   return (
@@ -102,9 +197,13 @@ export const SecurityAnalyzer = () => {
               onChange={(e) => setUrl(e.target.value)}
               className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400"
               disabled={isAnalyzing}
+              onFocus={() => handleClick('url_input')}
             />
             <Button 
-              onClick={handleAnalyze}
+              onClick={() => {
+                handleClick('analyze_button');
+                handleAnalyze();
+              }}
               disabled={isAnalyzing}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8"
             >
@@ -126,32 +225,32 @@ export const SecurityAnalyzer = () => {
 
       {/* Security Features Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-800 border-slate-700">
-          <CardContent className="p-6 text-center">
+        <Card className="bg-slate-800 border-slate-700" onClick={() => handleClick('feature_malware')}>
+          <CardContent className="p-6 text-center cursor-pointer">
             <Shield className="h-8 w-8 text-green-400 mx-auto mb-2" />
             <h3 className="font-semibold text-white mb-1">{t('malwareDetection')}</h3>
             <p className="text-sm text-slate-400">Scans for malicious scripts and downloads</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-slate-800 border-slate-700">
-          <CardContent className="p-6 text-center">
+        <Card className="bg-slate-800 border-slate-700" onClick={() => handleClick('feature_privacy')}>
+          <CardContent className="p-6 text-center cursor-pointer">
             <Eye className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
             <h3 className="font-semibold text-white mb-1">{t('privacyAnalysis')}</h3>
             <p className="text-sm text-slate-400">Checks for data tracking and collection</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-slate-800 border-slate-700">
-          <CardContent className="p-6 text-center">
+        <Card className="bg-slate-800 border-slate-700" onClick={() => handleClick('feature_cookies')}>
+          <CardContent className="p-6 text-center cursor-pointer">
             <Cookie className="h-8 w-8 text-orange-400 mx-auto mb-2" />
             <h3 className="font-semibold text-white mb-1">Cookie Inspection</h3>
             <p className="text-sm text-slate-400">Analyzes cookies for suspicious behavior</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-slate-800 border-slate-700">
-          <CardContent className="p-6 text-center">
+        <Card className="bg-slate-800 border-slate-700" onClick={() => handleClick('feature_ssl')}>
+          <CardContent className="p-6 text-center cursor-pointer">
             <Lock className="h-8 w-8 text-blue-400 mx-auto mb-2" />
             <h3 className="font-semibold text-white mb-1">SSL/TLS Check</h3>
             <p className="text-sm text-slate-400">Verifies encryption and certificates</p>
@@ -160,7 +259,7 @@ export const SecurityAnalyzer = () => {
       </div>
 
       {/* Security Report */}
-      {report && <SecurityReport report={report} />}
+      {report && <SecurityReport report={report} onAnalyzeNew={handleAnalyzeNew} />}
       
       {/* Educational Section */}
       <EducationalSection />

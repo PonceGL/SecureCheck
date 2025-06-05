@@ -3,6 +3,8 @@ import React from 'react';
 import { SecurityAnalyzer } from '@/components/SecurityAnalyzer';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { Analytics } from '@/components/Analytics';
+import { ApiDocumentation } from '@/components/ApiDocumentation';
 
 const Index = () => {
   return (
@@ -20,6 +22,8 @@ const Index = () => {
         <SecurityAnalyzer />
       </main>
       <Footer />
+      <Analytics />
+      <ApiDocumentation />
     </div>
   );
 };

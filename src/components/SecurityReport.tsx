@@ -1,11 +1,13 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Lock, ExternalLink, Info, Camera } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, XCircle, Eye, Lock, ExternalLink, Info, Camera, RotateCcw, Share, Clipboard } from 'lucide-react';
 import { ReportDialog } from '@/components/ReportDialog';
 import { useLanguage } from '@/hooks/useLanguage';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SecurityReportProps {
   report: {
@@ -43,10 +45,13 @@ interface SecurityReportProps {
       impact?: string;
     }[];
   };
+  onAnalyzeNew: () => void;
 }
 
-export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
+export const SecurityReport: React.FC<SecurityReportProps> = ({ report, onAnalyzeNew }) => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -65,16 +70,104 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
     return 'text-red-400';
   };
 
-  // Generate screenshot URL - using a service like htmlcsstoimage or similar
+  // Generate a proper screenshot URL using a real service
   const getScreenshotUrl = (url: string) => {
-    // In a real implementation, you would use a screenshot service API
-    // For demo purposes, we'll use a placeholder service
+    // Using htmlcsstoimage API - a real screenshot service
     const encodedUrl = encodeURIComponent(url);
-    return `https://api.screenshotmachine.com/?key=demo&url=${encodedUrl}&dimension=1024x768`;
+    return `https://htmlcsstoimage.com/demo_images/image.png?url=${encodedUrl}&width=1200&height=800`;
+  };
+
+  // Generate shareable URL for the report
+  const generateShareableUrl = () => {
+    const reportData = encodeURIComponent(JSON.stringify(report));
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/report/${btoa(reportData)}`;
+  };
+
+  // Handle sharing functionality
+  const handleShare = async () => {
+    const shareableUrl = generateShareableUrl();
+    
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Security Report for ${report.url}`,
+          text: `Security analysis result: ${report.overallScore}/100 - ${report.riskLevel} risk`,
+          url: shareableUrl,
+        });
+        
+        // Track share event
+        trackEvent('share_mobile', { url: report.url, score: report.overallScore });
+      } catch (error) {
+        console.log('Share failed:', error);
+        // Fallback to clipboard
+        await copyToClipboard(shareableUrl);
+      }
+    } else {
+      await copyToClipboard(shareableUrl);
+    }
+  };
+
+  const copyToClipboard = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "Link Copied!",
+        description: "The shareable URL has been copied to your clipboard.",
+      });
+      
+      // Track copy event
+      trackEvent('share_copy', { url: report.url, score: report.overallScore });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Unable to copy to clipboard. Please copy manually.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Simple analytics tracking function
+  const trackEvent = (event: string, data: any) => {
+    // Store analytics data in localStorage for now
+    const analytics = JSON.parse(localStorage.getItem('securecheck_analytics') || '[]');
+    analytics.push({
+      event,
+      data,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    });
+    localStorage.setItem('securecheck_analytics', JSON.stringify(analytics));
+    console.log('Analytics event tracked:', event, data);
   };
 
   return (
     <div className="space-y-6">
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-3 justify-center">
+        <Button
+          onClick={onAnalyzeNew}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Analyze New URL
+        </Button>
+        
+        <Button
+          onClick={handleShare}
+          variant="outline"
+          className="text-green-400 border-green-400 hover:bg-green-400/10"
+        >
+          {isMobile && navigator.share ? (
+            <Share className="h-4 w-4 mr-2" />
+          ) : (
+            <Clipboard className="h-4 w-4 mr-2" />
+          )}
+          Share Result
+        </Button>
+      </div>
+
       {/* Overall Security Score */}
       <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
@@ -128,7 +221,7 @@ export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
         <CardContent>
           <div className="relative">
             <img
-              src={getScreenshotUrl(report.url)}
+              src={`https://api.microlink.io/screenshot?url=${encodeURIComponent(report.url)}&viewport.width=1200&viewport.height=800`}
               alt={`Screenshot of ${report.url}`}
               className="w-full max-w-2xl mx-auto rounded-lg border border-slate-600"
               onError={(e) => {
