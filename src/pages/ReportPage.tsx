@@ -37,11 +37,15 @@ export const ReportPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-white mb-6">
-          {t("sharedReport")} - {report.url}
-        </h1>
-        <SecurityReport report={report} />
-        <AnalysisActions onAnalyzeNew={goToHome} report={report} />
+        {!!report && (
+          <>
+            <h1 className="text-2xl font-bold text-white mb-6">
+              {t("sharedReport")} - {report.url}
+            </h1>
+            <SecurityReport report={report} />
+            <AnalysisActions onAnalyzeNew={goToHome} report={report} />
+          </>
+        )}
       </main>
       <Footer />
     </div>

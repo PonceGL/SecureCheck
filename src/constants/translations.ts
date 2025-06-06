@@ -100,6 +100,111 @@ export const translations = {
     shareResult: "Share Result",
     sharedReport: "Shared Security Report",
     invalidReport: "Invalid or corrupted report",
+    security: {
+      malware: {
+        trojan: "Trojan Horse",
+        trojanDesc:
+          "This website may try to install software that looks harmless but secretly steals your personal information like passwords, credit card numbers, or private photos.",
+        spyware: "Spyware",
+        spywareDesc:
+          "This website contains software that watches what you do on your computer and sends that information to criminals without your permission.",
+        ransomware: "Ransomware",
+        ransomwareDesc:
+          "This website may install software that locks your computer files and demands money to unlock them.",
+        botnet: "Botnet Malware",
+        botnetDesc:
+          "This website may secretly use your computer to send spam emails or attack other websites without you knowing.",
+        risks: {
+          identity: "Identity theft",
+          financial: "Financial loss",
+          privacy: "Privacy invasion",
+          data: "Personal data theft",
+          keystroke: "Keystroke logging",
+          screen: "Screen monitoring",
+          encryption: "File encryption",
+          extortion: "Financial extortion",
+          unauthorized: "Unauthorized computer use",
+          performance: "Slow performance",
+          legal: "Legal liability",
+        },
+      },
+      phishing: {
+        banking: "Banking Fraud",
+        bankingDesc:
+          "This website is pretending to be your bank to steal your login details and empty your bank account.",
+        social: "Social Media Impersonation",
+        socialDesc:
+          "This website looks like a popular social media site but is fake, designed to steal your login information.",
+        shopping: "Shopping Scam",
+        shoppingDesc:
+          "This website pretends to sell products but will steal your credit card information and never send you anything.",
+        email: "Email Account Theft",
+        emailDesc:
+          "This website is designed to look like your email provider to steal your email password.",
+      },
+      dataTheft: {
+        personal: "Personal Information Harvesting",
+        personalDesc:
+          "This website collects way more personal information than it needs and may sell it to other companies without telling you.",
+        financial: "Financial Data Mining",
+        financialDesc:
+          "This website tries to gather information about your income, spending habits, and financial situation.",
+        behavioral: "Behavioral Tracking",
+        behavioralDesc:
+          "This website secretly tracks everything you do online to build a detailed profile about you.",
+      },
+      cookies: {
+        tracking: "Tracking Cookies",
+        trackingDesc:
+          "This website places invisible trackers on your computer that follow you around the internet to see what you do.",
+        crossSite: "Cross-Site Tracking",
+        crossSiteDesc:
+          "This website shares your information with many other websites so they can all track you together.",
+        persistent: "Persistent Tracking",
+        persistentDesc:
+          "This website uses advanced techniques to track you even when you try to delete cookies or use private browsing.",
+      },
+      downloads: {
+        fake: "Fake Software Downloads",
+        fakeDesc:
+          "This website offers downloads that look like legitimate software but actually contain harmful programs.",
+        bundled: "Bundled Malware",
+        bundledDesc:
+          "Downloads from this website come with hidden malicious software that installs automatically.",
+        corrupted: "Corrupted Files",
+        corruptedDesc:
+          "This website provides downloads that may be infected or modified to harm your computer.",
+      },
+      categories: {
+        malware: "Malware",
+        phishing: "Phishing",
+        encryption: "Encryption",
+        privacy: "Privacy",
+        tracking: "Tracking",
+        cookies: "Cookies",
+        downloads: "Downloads",
+      },
+      issues: {
+        detected: "{type} Detected",
+        attempt: "{type} Attempt",
+        noProtection: "No Security Protection",
+        surveillance: "Heavy Online Surveillance",
+      },
+      explanations: {
+        dangerous:
+          "This is extremely dangerous because it could lead to: {risks}. You should never visit this website.",
+        phishing:
+          "This website is trying to trick you into giving away: {info}. {consequences}",
+        encryption:
+          "Think of it like sending a postcard instead of a sealed letter - anyone who intercepts it can read your passwords, personal information, or credit card numbers.",
+        dataCollection: "This website collects: {data}. {risks}",
+        tracking:
+          "Imagine having multiple people following you around all day, writing down everything you do. That's what these trackers do online - they watch where you go, what you click, and how long you stay on pages.",
+        cookies:
+          "{risk} This means companies know more about you than you might be comfortable with.",
+        downloads: "{warning} Avoid downloading anything from this website.",
+      },
+    },
   },
   es: {
     securityAnalysis: "Análisis de Seguridad de URL",
@@ -194,5 +299,111 @@ export const translations = {
     shareResult: "Compartir Resultado",
     sharedReport: "Reporte de Seguridad Compartido",
     invalidReport: "Reporte inválido o corrupto",
+    security: {
+      malware: {
+        trojan: "Caballo de Troya",
+        trojanDesc:
+          "Este sitio web puede intentar instalar software que parece inofensivo pero que secretamente roba su información personal como contraseñas, números de tarjetas de crédito o fotos privadas.",
+        spyware: "Software Espía",
+        spywareDesc:
+          "Este sitio web contiene software que observa lo que hace en su computadora y envía esa información a criminales sin su permiso.",
+        ransomware: "Ransomware",
+        ransomwareDesc:
+          "Este sitio web puede instalar software que bloquea los archivos de su computadora y exige dinero para desbloquearlos.",
+        botnet: "Malware Botnet",
+        botnetDesc:
+          "Este sitio web puede usar secretamente su computadora para enviar correos electrónicos no deseados o atacar otros sitios web sin que usted lo sepa.",
+        risks: {
+          identity: "Robo de identidad",
+          financial: "Pérdida financiera",
+          privacy: "Invasión de privacidad",
+          data: "Robo de datos personales",
+          keystroke: "Registro de pulsaciones",
+          screen: "Monitoreo de pantalla",
+          encryption: "Encriptación de archivos",
+          extortion: "Extorsión financiera",
+          unauthorized: "Uso no autorizado de la computadora",
+          performance: "Rendimiento lento",
+          legal: "Responsabilidad legal",
+        },
+      },
+      phishing: {
+        banking: "Fraude Bancario",
+        bankingDesc:
+          "Este sitio web se hace pasar por su banco para robar sus datos de inicio de sesión y vaciar su cuenta bancaria.",
+        social: "Suplantación de Redes Sociales",
+        socialDesc:
+          "Este sitio web parece una red social popular pero es falso, diseñado para robar su información de inicio de sesión.",
+        shopping: "Estafa de Compras",
+        shoppingDesc:
+          "Este sitio web finge vender productos pero robará la información de su tarjeta de crédito y nunca le enviará nada.",
+        email: "Robo de Cuenta de Correo",
+        emailDesc:
+          "Este sitio web está diseñado para parecer su proveedor de correo electrónico para robar su contraseña.",
+      },
+      dataTheft: {
+        personal: "Recolección de Información Personal",
+        personalDesc:
+          "Este sitio web recopila mucha más información personal de la necesaria y puede venderla a otras empresas sin informarle.",
+        financial: "Minería de Datos Financieros",
+        financialDesc:
+          "Este sitio web intenta recopilar información sobre sus ingresos, hábitos de gasto y situación financiera.",
+        behavioral: "Seguimiento de Comportamiento",
+        behavioralDesc:
+          "Este sitio web rastrea secretamente todo lo que hace en línea para crear un perfil detallado sobre usted.",
+      },
+      cookies: {
+        tracking: "Cookies de Rastreo",
+        trackingDesc:
+          "Este sitio web coloca rastreadores invisibles en su computadora que lo siguen por Internet para ver lo que hace.",
+        crossSite: "Rastreo Entre Sitios",
+        crossSiteDesc:
+          "Este sitio web comparte su información con muchos otros sitios web para que todos puedan rastrearlo juntos.",
+        persistent: "Rastreo Persistente",
+        persistentDesc:
+          "Este sitio web utiliza técnicas avanzadas para rastrearlo incluso cuando intenta eliminar cookies o usar navegación privada.",
+      },
+      downloads: {
+        fake: "Descargas de Software Falso",
+        fakeDesc:
+          "Este sitio web ofrece descargas que parecen software legítimo pero que en realidad contienen programas dañinos.",
+        bundled: "Malware Incluido",
+        bundledDesc:
+          "Las descargas de este sitio web vienen con software malicioso oculto que se instala automáticamente.",
+        corrupted: "Archivos Corruptos",
+        corruptedDesc:
+          "Este sitio web proporciona descargas que pueden estar infectadas o modificadas para dañar su computadora.",
+      },
+      categories: {
+        malware: "Malware",
+        phishing: "Phishing",
+        encryption: "Encriptación",
+        privacy: "Privacidad",
+        tracking: "Rastreo",
+        cookies: "Cookies",
+        downloads: "Descargas",
+      },
+      issues: {
+        detected: "{type} Detectado",
+        attempt: "Intento de {type}",
+        noProtection: "Sin Protección de Seguridad",
+        surveillance: "Vigilancia Online Severa",
+      },
+      explanations: {
+        dangerous:
+          "Esto es extremadamente peligroso porque puede llevar a: {risks}. Nunca debe visitar este sitio web.",
+        phishing:
+          "Este sitio web está intentando engañarlo para que proporcione: {info}. {consequences}",
+        encryption:
+          "Piense en ello como enviar una postal en lugar de una carta sellada - cualquiera que la intercepte puede leer sus contraseñas, información personal o números de tarjetas de crédito.",
+        dataCollection: "Este sitio web recopila: {data}. {risks}",
+        tracking:
+          "Imagine tener múltiples personas siguiéndolo todo el día, anotando todo lo que hace. Eso es lo que hacen estos rastreadores en línea - observan a dónde va, en qué hace clic y cuánto tiempo permanece en las páginas.",
+        cookies:
+          "{risk} Esto significa que las empresas saben más sobre usted de lo que podría ser cómodo.",
+        downloads:
+          "{warning} Evite descargar cualquier cosa de este sitio web.",
+      },
+    },
   },
 };

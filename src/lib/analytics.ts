@@ -138,6 +138,4 @@ export const trackEvent = <T extends AnalyticsEvent["event"]>(
     "securecheck_analytics",
     JSON.stringify(storedAnalytics)
   );
-
-  console.log("Analytics event tracked:", analytics);
 };
