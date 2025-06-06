@@ -34,16 +34,16 @@ export const SecurityAnalyzer = () => {
     };
   }, []);
 
-  const handleAnalyze = async () => {
-    if (!validateUrl(url)) {
+  const handleAnalyze = async (urlToAnalyze: string) => {
+    if (!validateUrl(urlToAnalyze)) {
       return;
     }
 
-    trackEvent("analysis_started", { url });
+    trackEvent("analysis_started", { url: urlToAnalyze });
     const cleanup = startProgress();
 
     try {
-      const analysisResult = await analyzeUrl(url);
+      const analysisResult = await analyzeUrl(urlToAnalyze);
       setReport(analysisResult);
       completeProgress();
     } catch (error) {
@@ -63,8 +63,6 @@ export const SecurityAnalyzer = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <AnalysisForm
-        url={url}
-        setUrl={setUrl}
         isAnalyzing={isAnalyzing}
         progress={progress}
         onAnalyze={handleAnalyze}
