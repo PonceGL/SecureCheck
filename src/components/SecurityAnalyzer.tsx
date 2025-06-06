@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { SecurityReport } from "@/components/SecurityReport";
 import { EducationalSection } from "@/components/EducationalSection";
-import { analyzeUrlSecurity } from "@/utils/securityAnalyzer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackEvent } from "@/lib/analytics";
 import { AnalysisForm } from "@/components/AnalysisForm";
 import { SecurityFeatures } from "@/components/SecurityFeatures";
+import { useUrlValidation } from "@/hooks/useUrlValidation";
+import { useAnalysisProgress } from "@/hooks/useAnalysisProgress";
+import { useSecurityAnalysis } from "@/hooks/useSecurityAnalysis";
 
 export const SecurityAnalyzer = () => {
   const [url, setUrl] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [report, setReport] = useState(null);
-  const { toast } = useToast();
   const { t } = useLanguage();
+  const { validateUrl } = useUrlValidation();
+  const {
+    progress,
+    isAnalyzing,
+    startProgress,
+    completeProgress,
+    resetProgress,
+  } = useAnalysisProgress();
+  const { report, setReport, analyzeUrl, resetAnalysis } =
+    useSecurityAnalysis();
 
   // Analytics tracking
   useEffect(() => {
@@ -28,82 +35,28 @@ export const SecurityAnalyzer = () => {
   }, []);
 
   const handleAnalyze = async () => {
-    if (!url) {
-      toast({
-        title: t("error"),
-        description: t("enterUrlToAnalyze"),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      new URL(url);
-    } catch {
-      toast({
-        title: t("invalidUrl"),
-        description: t("enterValidUrl"),
-        variant: "destructive",
-      });
+    if (!validateUrl(url)) {
       return;
     }
 
     trackEvent("analysis_started", { url });
-
-    setIsAnalyzing(true);
-    setProgress(0);
-    setReport(null);
-
-    // Simulate analysis progress
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 90) {
-          clearInterval(progressInterval);
-          return 90;
-        }
-        return prev + 10;
-      });
-    }, 200);
+    const cleanup = startProgress();
 
     try {
-      console.log("Starting security analysis for:", url);
-      const analysisResult = await analyzeUrlSecurity(url);
-
-      setProgress(100);
-      setTimeout(() => {
-        setReport(analysisResult);
-        setIsAnalyzing(false);
-
-        trackEvent("analysis_completed", {
-          url,
-          score: analysisResult.overallScore,
-          riskLevel: analysisResult.riskLevel,
-        });
-
-        toast({
-          title: t("analysisComplete"),
-          description: t("securityScanCompleted", { url }),
-        });
-      }, 500);
+      const analysisResult = await analyzeUrl(url);
+      setReport(analysisResult);
+      completeProgress();
     } catch (error) {
-      console.error("Security analysis failed:", error);
-      setIsAnalyzing(false);
-      setProgress(0);
-
-      trackEvent("analysis_failed", { url, error: error.message });
-
-      toast({
-        title: t("analysisFailed"),
-        description: t("unableToCompleteAnalysis"),
-        variant: "destructive",
-      });
+      resetProgress();
+    } finally {
+      cleanup?.();
     }
   };
 
   const handleAnalyzeNew = () => {
     setUrl("");
-    setReport(null);
-    setProgress(0);
+    resetAnalysis();
+    resetProgress();
     trackEvent("analyze_new_clicked", {});
   };
 
