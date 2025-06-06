@@ -65,6 +65,20 @@ export const translations = {
     secureCheckTitle: "SecureCheck",
     secureCheckMainDescription:
       "Advanced URL security analyzer that identifies threats, malicious content, and data privacy risks",
+    analyzingSecurityThreats: "Analyzing security threats...",
+    malwareDetectionDescription: "Scans for malicious scripts and downloads",
+    privacyAnalysisDescription: "Checks for data tracking and collection",
+    cookieInspection: "Cookie Inspection",
+    cookieInspectionDescription: "Analyzes cookies for suspicious behavior",
+    sslTlsCheck: "SSL/TLS Check",
+    sslTlsCheckDescription: "Verifies encryption and certificates",
+    error: "Error",
+    enterUrlToAnalyze: "Please enter a URL to analyze",
+    invalidUrl: "Invalid URL",
+    enterValidUrl: "Please enter a valid URL (e.g., https://example.com)",
+    securityScanCompleted: "Security scan completed for {url}",
+    unableToCompleteAnalysis:
+      "Unable to complete security analysis. Please try again.",
   },
   es: {
     securityAnalysis: "Análisis de Seguridad de URL",
@@ -121,5 +135,21 @@ export const translations = {
     secureCheckTitle: "SecureCheck",
     secureCheckMainDescription:
       "Analizador avanzado de seguridad de URL que identifica amenazas, contenido malicioso y riesgos de privacidad de datos",
+    analyzingSecurityThreats: "Analizando amenazas de seguridad...",
+    malwareDetectionDescription: "Escanea scripts y descargas maliciosas",
+    privacyAnalysisDescription:
+      "Verifica el seguimiento y recopilación de datos",
+    cookieInspection: "Inspección de Cookies",
+    cookieInspectionDescription:
+      "Analiza cookies por comportamiento sospechoso",
+    sslTlsCheck: "Verificación SSL/TLS",
+    sslTlsCheckDescription: "Verifica el cifrado y certificados",
+    error: "Error",
+    enterUrlToAnalyze: "Por favor ingrese una URL para analizar",
+    invalidUrl: "URL inválida",
+    enterValidUrl: "Por favor ingrese una URL válida (ej. https://ejemplo.com)",
+    securityScanCompleted: "Análisis de seguridad completado para {url}",
+    unableToCompleteAnalysis:
+      "No se pudo completar el análisis de seguridad. Por favor intente nuevamente.",
   },
 };

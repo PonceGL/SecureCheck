@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Eye, Cookie, Lock } from "lucide-react";
 import { SecurityReport } from "@/components/SecurityReport";
 import { EducationalSection } from "@/components/EducationalSection";
 import { analyzeUrlSecurity } from "@/utils/securityAnalyzer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackEvent } from "@/lib/analytics";
+import { AnalysisForm } from "@/components/AnalysisForm";
+import { SecurityFeatures } from "@/components/SecurityFeatures";
 
 export const SecurityAnalyzer = () => {
   const [url, setUrl] = useState("");
@@ -21,10 +18,7 @@ export const SecurityAnalyzer = () => {
 
   // Analytics tracking
   useEffect(() => {
-    // Track page visit
     trackEvent("page_visit", { referrer: document.referrer });
-
-    // Track time spent on site
     const startTime = Date.now();
 
     return () => {
@@ -36,8 +30,8 @@ export const SecurityAnalyzer = () => {
   const handleAnalyze = async () => {
     if (!url) {
       toast({
-        title: "Error",
-        description: "Please enter a URL to analyze",
+        title: t("error"),
+        description: t("enterUrlToAnalyze"),
         variant: "destructive",
       });
       return;
@@ -47,8 +41,8 @@ export const SecurityAnalyzer = () => {
       new URL(url);
     } catch {
       toast({
-        title: "Invalid URL",
-        description: "Please enter a valid URL (e.g., https://example.com)",
+        title: t("invalidUrl"),
+        description: t("enterValidUrl"),
         variant: "destructive",
       });
       return;
@@ -88,7 +82,7 @@ export const SecurityAnalyzer = () => {
 
         toast({
           title: t("analysisComplete"),
-          description: `Security scan completed for ${url}`,
+          description: t("securityScanCompleted", { url }),
         });
       }, 500);
     } catch (error) {
@@ -100,7 +94,7 @@ export const SecurityAnalyzer = () => {
 
       toast({
         title: t("analysisFailed"),
-        description: "Unable to complete security analysis. Please try again.",
+        description: t("unableToCompleteAnalysis"),
         variant: "destructive",
       });
     }
@@ -113,121 +107,22 @@ export const SecurityAnalyzer = () => {
     trackEvent("analyze_new_clicked", {});
   };
 
-  // Track clicks
-  const handleClick = (element: string) => {
-    trackEvent("click", { element });
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* URL Input Section */}
-      <Card className="bg-slate-800 border-slate-700">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
-            <Shield className="h-6 w-6 text-blue-400" />
-            {t("securityAnalysis")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              type="url"
-              placeholder={t("enterUrl")}
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400"
-              disabled={isAnalyzing}
-              onFocus={() => handleClick("url_input")}
-            />
-            <Button
-              onClick={() => {
-                handleClick("analyze_button");
-                handleAnalyze();
-              }}
-              disabled={isAnalyzing}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8"
-            >
-              {isAnalyzing ? t("analyzing") : t("analyze")}
-            </Button>
-          </div>
+      <AnalysisForm
+        url={url}
+        setUrl={setUrl}
+        isAnalyzing={isAnalyzing}
+        progress={progress}
+        onAnalyze={handleAnalyze}
+      />
 
-          {isAnalyzing && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-slate-300">
-                <span>Analyzing security threats...</span>
-                <span>{progress}%</span>
-              </div>
-              <Progress value={progress} className="h-2" />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <SecurityFeatures />
 
-      {/* Security Features Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card
-          className="bg-slate-800 border-slate-700"
-          onClick={() => handleClick("feature_malware")}
-        >
-          <CardContent className="p-6 text-center cursor-pointer">
-            <Shield className="h-8 w-8 text-green-400 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">
-              {t("malwareDetection")}
-            </h3>
-            <p className="text-sm text-slate-400">
-              Scans for malicious scripts and downloads
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="bg-slate-800 border-slate-700"
-          onClick={() => handleClick("feature_privacy")}
-        >
-          <CardContent className="p-6 text-center cursor-pointer">
-            <Eye className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">
-              {t("privacyAnalysis")}
-            </h3>
-            <p className="text-sm text-slate-400">
-              Checks for data tracking and collection
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="bg-slate-800 border-slate-700"
-          onClick={() => handleClick("feature_cookies")}
-        >
-          <CardContent className="p-6 text-center cursor-pointer">
-            <Cookie className="h-8 w-8 text-orange-400 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">Cookie Inspection</h3>
-            <p className="text-sm text-slate-400">
-              Analyzes cookies for suspicious behavior
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="bg-slate-800 border-slate-700"
-          onClick={() => handleClick("feature_ssl")}
-        >
-          <CardContent className="p-6 text-center cursor-pointer">
-            <Lock className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <h3 className="font-semibold text-white mb-1">SSL/TLS Check</h3>
-            <p className="text-sm text-slate-400">
-              Verifies encryption and certificates
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Security Report */}
       {report && (
         <SecurityReport report={report} onAnalyzeNew={handleAnalyzeNew} />
       )}
 
-      {/* Educational Section */}
       <EducationalSection />
     </div>
   );
