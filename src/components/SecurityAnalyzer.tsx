@@ -66,6 +66,8 @@ export const SecurityAnalyzer = () => {
         isAnalyzing={isAnalyzing}
         progress={progress}
         onAnalyze={handleAnalyze}
+        report={report}
+        onAnalyzeNew={handleAnalyzeNew}
       />
 
       <SecurityFeatures />

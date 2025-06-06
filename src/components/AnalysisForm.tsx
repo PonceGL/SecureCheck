@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Shield } from "lucide-react";
+import { Shield, RotateCcw, Share, Clipboard } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useUrlValidation } from "@/hooks/useUrlValidation";
+import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/analytics";
 
 interface AnalysisFormData {
@@ -17,15 +19,24 @@ interface AnalysisFormProps {
   isAnalyzing: boolean;
   progress: number;
   onAnalyze: (url: string) => void;
+  onAnalyzeNew?: () => void;
+  report?: {
+    url: string;
+    overallScore: number;
+  };
 }
 
 export const AnalysisForm: React.FC<AnalysisFormProps> = ({
   isAnalyzing,
   progress,
   onAnalyze,
+  onAnalyzeNew,
+  report,
 }) => {
   const { t } = useLanguage();
   const { validateUrl } = useUrlValidation();
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
   const {
     register,
     handleSubmit,
@@ -42,6 +53,55 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
     if (validateUrl(data.url)) {
       handleClick("analyze_button");
       onAnalyze(data.url);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!report) return;
+
+    const shareableUrl = `${window.location.origin}/report/${btoa(
+      JSON.stringify(report)
+    )}`;
+
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({
+          title: t("shareTitle", { url: report.url }),
+          text: t("shareText", { score: report.overallScore }),
+          url: shareableUrl,
+        });
+
+        trackEvent("share_mobile", {
+          url: report.url,
+          score: report.overallScore,
+        });
+      } catch (error) {
+        console.log("Share failed:", error);
+        await copyToClipboard(shareableUrl);
+      }
+    } else {
+      await copyToClipboard(shareableUrl);
+    }
+  };
+
+  const copyToClipboard = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: t("linkCopied"),
+        description: t("linkCopiedDescription"),
+      });
+
+      trackEvent("share_copy", {
+        url: report?.url,
+        score: report?.overallScore,
+      });
+    } catch (error) {
+      toast({
+        title: t("copyFailed"),
+        description: t("copyFailedDescription"),
+        variant: "destructive",
+      });
     }
   };
 
@@ -95,6 +155,31 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
               <span>{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
+          </div>
+        )}
+
+        {report && onAnalyzeNew && (
+          <div className="flex flex-wrap gap-3 justify-center pt-4 border-t border-slate-700">
+            <Button
+              onClick={onAnalyzeNew}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              {t("analyzeNewUrl")}
+            </Button>
+
+            <Button
+              onClick={handleShare}
+              variant="outline"
+              className="text-green-400 border-green-400 hover:bg-green-400/10"
+            >
+              {isMobile && navigator.share ? (
+                <Share className="h-4 w-4 mr-2" />
+              ) : (
+                <Clipboard className="h-4 w-4 mr-2" />
+              )}
+              {t("shareResult")}
+            </Button>
           </div>
         )}
       </CardContent>
