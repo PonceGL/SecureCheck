@@ -1,18 +1,17 @@
 import { useState, useCallback } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { useLanguage } from "@/hooks/useLanguage";
 import { analyzeUrlSecurity } from "@/utils/securityAnalyzer";
 import { trackEvent } from "@/lib/analytics";
 
 export const useSecurityAnalysis = () => {
   const [report, setReport] = useState(null);
-  const { toast } = useToast();
+  const { show } = useToast();
   const { t } = useLanguage();
 
   const analyzeUrl = useCallback(
     async (url: string) => {
       try {
-        console.log("Starting security analysis for:", url);
         const analysisResult = await analyzeUrlSecurity(url);
 
         trackEvent("analysis_completed", {
@@ -21,9 +20,9 @@ export const useSecurityAnalysis = () => {
           riskLevel: analysisResult.riskLevel,
         });
 
-        toast({
+        show({
           title: t("analysisComplete"),
-          description: t("securityScanCompleted", { url }),
+          message: t("securityScanCompleted", { url }),
         });
 
         return analysisResult;
@@ -31,16 +30,16 @@ export const useSecurityAnalysis = () => {
         console.error("Security analysis failed:", error);
         trackEvent("analysis_failed", { url, error: error.message });
 
-        toast({
-          title: t("analysisFailed"),
-          description: t("unableToCompleteAnalysis"),
-          variant: "destructive",
+        show({
+          type: "error",
+          title: "Error",
+          message: "No se pudo realizar el análisis de seguridad",
         });
 
         throw error;
       }
     },
-    [t, toast]
+    [t, show]
   );
 
   const resetAnalysis = useCallback(() => {

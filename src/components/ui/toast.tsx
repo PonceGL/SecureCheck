@@ -1,132 +1,154 @@
 import React, {
-  ComponentPropsWithoutRef,
-  ElementRef,
-  forwardRef,
-  ReactElement,
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+  useMemo,
 } from "react";
-import * as ToastPrimitives from "@radix-ui/react-toast";
-import { cva, type VariantProps } from "class-variance-authority";
-import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+export type ToastType = "success" | "error" | "warning" | "info";
 
-const ToastProvider = ToastPrimitives.Provider;
-
-const ToastViewport = forwardRef<
-  ElementRef<typeof ToastPrimitives.Viewport>,
-  ComponentPropsWithoutRef<typeof ToastPrimitives.Viewport>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Viewport
-    ref={ref}
-    className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
-      className
-    )}
-    {...props}
-  />
-));
-ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
-
-const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
-  {
-    variants: {
-      variant: {
-        default: "border bg-background text-foreground",
-        destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-);
-
-const Toast = forwardRef<
-  ElementRef<typeof ToastPrimitives.Root>,
-  ComponentPropsWithoutRef<typeof ToastPrimitives.Root> &
-    VariantProps<typeof toastVariants>
->(({ className, variant, ...props }, ref) => {
-  return (
-    <ToastPrimitives.Root
-      ref={ref}
-      className={cn(toastVariants({ variant }), className)}
-      {...props}
-    />
-  );
-});
-Toast.displayName = ToastPrimitives.Root.displayName;
-
-const ToastAction = forwardRef<
-  ElementRef<typeof ToastPrimitives.Action>,
-  ComponentPropsWithoutRef<typeof ToastPrimitives.Action>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Action
-    ref={ref}
-    className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
-      className
-    )}
-    {...props}
-  />
-));
-ToastAction.displayName = ToastPrimitives.Action.displayName;
-
-const ToastClose = forwardRef<
-  ElementRef<typeof ToastPrimitives.Close>,
-  ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Close
-    ref={ref}
-    className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
-      className
-    )}
-    toast-close=""
-    {...props}
-  >
-    <X className="h-4 w-4" />
-  </ToastPrimitives.Close>
-));
-ToastClose.displayName = ToastPrimitives.Close.displayName;
-
-const ToastTitle = forwardRef<
-  ElementRef<typeof ToastPrimitives.Title>,
-  ComponentPropsWithoutRef<typeof ToastPrimitives.Title>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Title
-    ref={ref}
-    className={cn("text-sm font-semibold", className)}
-    {...props}
-  />
-));
-ToastTitle.displayName = ToastPrimitives.Title.displayName;
-
-const ToastDescription = forwardRef<
-  ElementRef<typeof ToastPrimitives.Description>,
-  ComponentPropsWithoutRef<typeof ToastPrimitives.Description>
->(({ className, ...props }, ref) => (
-  <ToastPrimitives.Description
-    ref={ref}
-    className={cn("text-sm opacity-90", className)}
-    {...props}
-  />
-));
-ToastDescription.displayName = ToastPrimitives.Description.displayName;
-
-type ToastProps = ComponentPropsWithoutRef<typeof Toast>;
-
-type ToastActionElement = ReactElement<typeof ToastAction>;
-
-export {
-  type ToastProps,
-  type ToastActionElement,
-  ToastProvider,
-  ToastViewport,
-  Toast,
-  ToastTitle,
-  ToastDescription,
-  ToastClose,
-  ToastAction,
+export type Toast = {
+  type?: ToastType;
+  title?: string;
+  message?: string;
+  duration?: number;
 };
+
+export interface ToastContextType {
+  toasts: Toast;
+  show: (toast: Toast) => void;
+  dismiss: () => void;
+}
+
+const DEFAULT_TIME = 3 * 1000;
+
+const ToastContext = createContext<ToastContextType | null>(null);
+
+export function useToastContext() {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
+  return context;
+}
+
+const DEFAULT_TOATS: Toast = {
+  type: "success",
+  duration: DEFAULT_TIME,
+};
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toasts, setToasts] = useState<Toast>(DEFAULT_TOATS);
+  const [showToasts, setShowToasts] = useState<boolean>(false);
+
+  const dismiss = useCallback(() => {
+    setShowToasts(false);
+    setToasts(DEFAULT_TOATS);
+  }, []);
+
+  const show = useCallback(
+    (config: Toast) => {
+      setToasts({
+        ...toasts,
+        ...config,
+      });
+      setShowToasts(true);
+      setTimeout(() => {
+        dismiss();
+      }, toasts.duration ?? DEFAULT_TIME);
+    },
+    [dismiss, toasts]
+  );
+
+  const icon = useMemo(() => {
+    if (toasts?.type === "success") {
+      return "M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z";
+    }
+    if (toasts?.type === "error") {
+      return "M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z";
+    }
+    if (toasts?.type === "warning") {
+      return "M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z";
+    }
+    return "M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z";
+  }, [toasts]);
+
+  const color = useMemo(() => {
+    if (toasts?.type === "success") {
+      return "bg-green-800 text-green-200";
+    }
+    if (toasts?.type === "error") {
+      return "text-red-500 bg-red-100";
+    }
+    if (toasts?.type === "warning") {
+      return "text-orange-500 bg-orange-100";
+    }
+    return "bg-gray-500 text-gray-50";
+  }, [toasts]);
+
+  return (
+    <ToastContext.Provider value={{ toasts, show, dismiss }}>
+      {showToasts && (
+        <div
+          id={`toast-${toasts?.type ?? "success"}`}
+          className="w-fit grid grid-cols-[1fr_8fr_1fr] items-center justify-center gap-x-2.5 min-w-80 max-w-[100vw] p-4 rounded-lg shadow-md text-gray-400 bg-gray-700 fixed z-50 md:bottom-4 md:right-4 md:max-w-96"
+          role="alert"
+        >
+          <div
+            className={`inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg ${color}`}
+          >
+            <svg
+              className="w-5 h-5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d={icon} />
+            </svg>
+            <span className="sr-only">Check icon</span>
+          </div>
+          <div className="w-full flex-col gap-2">
+            {toasts.title && (
+              <p className="text-sm font-semibold line-clamp-1">
+                {toasts.title}
+              </p>
+            )}
+            {toasts.message && (
+              <p className="text-sm font-normal line-clamp-2">
+                {toasts.message}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            className="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 inline-flex items-center justify-center h-8 w-8 text-gray-500 hover:text-white bg-gray-800 hover:bg-gray-700"
+            data-dismiss-target="#toast-success"
+            aria-label="Close"
+            onClick={dismiss}
+          >
+            <span className="sr-only">Close</span>
+            <svg
+              className="w-3 h-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
+      {children}
+    </ToastContext.Provider>
+  );
+}

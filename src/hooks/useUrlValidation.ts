@@ -1,16 +1,16 @@
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { useLanguage } from "@/hooks/useLanguage";
 
 export const useUrlValidation = () => {
-  const { toast } = useToast();
+  const { show } = useToast();
   const { t } = useLanguage();
 
   const validateUrl = (url: string): boolean => {
     if (!url) {
-      toast({
-        title: t("error"),
-        description: t("enterUrlToAnalyze"),
-        variant: "destructive",
+      show({
+        type: "error",
+        title: "Error",
+        message: t("enterUrlToAnalyze"),
       });
       return false;
     }
@@ -19,10 +19,10 @@ export const useUrlValidation = () => {
       new URL(url);
       return true;
     } catch {
-      toast({
-        title: t("invalidUrl"),
-        description: t("enterValidUrl"),
-        variant: "destructive",
+      show({
+        type: "error",
+        title: "Error",
+        message: t("enterValidUrl"),
       });
       return false;
     }

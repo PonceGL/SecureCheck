@@ -1,4 +1,3 @@
-import React from "react";
 import { SecurityAnalyzer } from "@/components/SecurityAnalyzer";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";

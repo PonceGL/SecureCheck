@@ -1,20 +1,20 @@
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/useToast";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/analytics";
 import { SecurityReport } from "@/types/security";
 
 export const useShare = () => {
-  const { toast } = useToast();
+  const { show } = useToast();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
   const copyToClipboard = async (url: string, report?: SecurityReport) => {
     try {
       await navigator.clipboard.writeText(url);
-      toast({
+      show({
         title: t("linkCopied"),
-        description: t("linkCopiedDescription"),
+        message: t("linkCopiedDescription"),
       });
 
       trackEvent("share_copy", {
@@ -22,10 +22,10 @@ export const useShare = () => {
         score: report?.overallScore,
       });
     } catch {
-      toast({
-        title: t("copyFailed"),
-        description: t("copyFailedDescription"),
-        variant: "destructive",
+      show({
+        type: "error",
+        title: "Error",
+        message: "No se pudo compartir el enlace",
       });
     }
   };
