@@ -9,7 +9,7 @@ export const AnalysisHeader: React.FC = () => {
   return (
     <CardHeader>
       <CardTitle className="flex items-center gap-2 text-white">
-        <Shield className="h-6 w-6 text-blue-400" />
+        <Shield className="hidden md:flex h-6 w-6 text-blue-400" />
         {t("securityAnalysis")}
       </CardTitle>
     </CardHeader>

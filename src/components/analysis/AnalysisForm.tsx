@@ -34,7 +34,7 @@ export const AnalysisForm: React.FC<AnalysisFormProps> = ({
   return (
     <div className="space-y-4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-8 md:flex-row md:gap-2">
           <div className="flex-1">
             <Input
               {...register("url", {
