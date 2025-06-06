@@ -98,6 +98,8 @@ export const translations = {
     copyFailedDescription: "Unable to copy to clipboard. Please copy manually.",
     analyzeNewUrl: "Analyze New URL",
     shareResult: "Share Result",
+    sharedReport: "Shared Security Report",
+    invalidReport: "Invalid or corrupted report",
   },
   es: {
     securityAnalysis: "Análisis de Seguridad de URL",
@@ -190,5 +192,7 @@ export const translations = {
       "No se pudo copiar al portapapeles. Por favor copie manualmente.",
     analyzeNewUrl: "Analizar Nueva URL",
     shareResult: "Compartir Resultado",
+    sharedReport: "Reporte de Seguridad Compartido",
+    invalidReport: "Reporte inválido o corrupto",
   },
 };

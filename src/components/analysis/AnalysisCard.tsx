@@ -6,16 +6,14 @@ import { AnalysisHeader } from "./AnalysisHeader";
 import { AnalysisForm } from "./AnalysisForm";
 import { AnalysisActions } from "./AnalysisActions";
 import { useAnalysisForm } from "@/hooks/useAnalysisForm";
+import { SecurityReport } from "@/types/security";
 
 interface AnalysisCardProps {
   isAnalyzing: boolean;
   progress: number;
   onAnalyze: (url: string) => void;
   onAnalyzeNew?: () => void;
-  report?: {
-    url: string;
-    overallScore: number;
-  };
+  report?: SecurityReport;
 }
 
 export const AnalysisCard: React.FC<AnalysisCardProps> = ({

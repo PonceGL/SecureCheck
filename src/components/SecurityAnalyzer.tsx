@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { SecurityReport } from "@/components/SecurityReport";
 import { EducationalSection } from "@/components/EducationalSection";
-import { useLanguage } from "@/hooks/useLanguage";
 import { trackEvent } from "@/lib/analytics";
 import { SecurityFeatures } from "@/components/SecurityFeatures";
 import { useUrlValidation } from "@/hooks/useUrlValidation";
@@ -10,7 +9,6 @@ import { useSecurityAnalysis } from "@/hooks/useSecurityAnalysis";
 import { AnalysisCard } from "@/components/analysis/AnalysisCard";
 
 export const SecurityAnalyzer = () => {
-  const { t } = useLanguage();
   const { validateUrl } = useUrlValidation();
   const {
     progress,
@@ -45,7 +43,7 @@ export const SecurityAnalyzer = () => {
       const analysisResult = await analyzeUrl(urlToAnalyze);
       setReport(analysisResult);
       completeProgress();
-    } catch (error) {
+    } catch {
       resetProgress();
     } finally {
       cleanup?.();
@@ -70,9 +68,7 @@ export const SecurityAnalyzer = () => {
 
       {!report && <SecurityFeatures />}
 
-      {report && (
-        <SecurityReport report={report} onAnalyzeNew={handleAnalyzeNew} />
-      )}
+      {report && <SecurityReport report={report} />}
 
       <EducationalSection />
     </div>

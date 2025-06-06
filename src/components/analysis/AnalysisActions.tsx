@@ -4,13 +4,11 @@ import { RotateCcw, Share, Clipboard } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useShare } from "@/hooks/useShare";
+import { SecurityReport } from "@/types/security";
 
 interface AnalysisActionsProps {
   onAnalyzeNew: () => void;
-  report: {
-    url: string;
-    overallScore: number;
-  };
+  report: SecurityReport;
 }
 
 export const AnalysisActions: React.FC<AnalysisActionsProps> = ({

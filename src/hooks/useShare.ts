@@ -2,18 +2,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/analytics";
-
-interface ShareReport {
-  url: string;
-  overallScore: number;
-}
+import { SecurityReport } from "@/types/security";
 
 export const useShare = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
-  const copyToClipboard = async (url: string, report?: ShareReport) => {
+  const copyToClipboard = async (url: string, report?: SecurityReport) => {
     try {
       await navigator.clipboard.writeText(url);
       toast({
@@ -25,7 +21,7 @@ export const useShare = () => {
         url: report?.url,
         score: report?.overallScore,
       });
-    } catch (error) {
+    } catch {
       toast({
         title: t("copyFailed"),
         description: t("copyFailedDescription"),
@@ -34,7 +30,7 @@ export const useShare = () => {
     }
   };
 
-  const shareReport = async (report: ShareReport) => {
+  const shareReport = async (report: SecurityReport) => {
     const shareableUrl = `${window.location.origin}/report/${btoa(
       JSON.stringify(report)
     )}`;
