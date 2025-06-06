@@ -32,19 +32,17 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({ url }) => {
     }
 
     setIsSubmitting(true);
-    
+
     // Simulate API call to submit report
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Report submitted for URL:', url, 'Explanation:', explanation);
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     toast({
-      title: t('reportSubmitted'),
+      title: t("reportSubmitted"),
       description: `Report for ${url} has been submitted for review.`,
     });
-    
+
     setIsOpen(false);
-    setExplanation('');
+    setExplanation("");
     setIsSubmitting(false);
   };
 

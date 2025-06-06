@@ -49,7 +49,7 @@ export const ApiDocumentation = () => {
         title: "Copied!",
         description: "Code copied to clipboard",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Copy Failed",
         description: "Unable to copy to clipboard",
