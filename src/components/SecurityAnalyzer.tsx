@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { SecurityReport } from "@/components/SecurityReport";
 import { EducationalSection } from "@/components/EducationalSection";
 import { useLanguage } from "@/hooks/useLanguage";
 import { trackEvent } from "@/lib/analytics";
-import { AnalysisForm } from "@/components/AnalysisForm";
 import { SecurityFeatures } from "@/components/SecurityFeatures";
 import { useUrlValidation } from "@/hooks/useUrlValidation";
 import { useAnalysisProgress } from "@/hooks/useAnalysisProgress";
 import { useSecurityAnalysis } from "@/hooks/useSecurityAnalysis";
+import { AnalysisCard } from "@/components/analysis/AnalysisCard";
 
 export const SecurityAnalyzer = () => {
-  const [url, setUrl] = useState("");
   const { t } = useLanguage();
   const { validateUrl } = useUrlValidation();
   const {
@@ -54,7 +53,6 @@ export const SecurityAnalyzer = () => {
   };
 
   const handleAnalyzeNew = () => {
-    setUrl("");
     resetAnalysis();
     resetProgress();
     trackEvent("analyze_new_clicked", {});
@@ -62,7 +60,7 @@ export const SecurityAnalyzer = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <AnalysisForm
+      <AnalysisCard
         isAnalyzing={isAnalyzing}
         progress={progress}
         onAnalyze={handleAnalyze}
@@ -70,7 +68,7 @@ export const SecurityAnalyzer = () => {
         onAnalyzeNew={handleAnalyzeNew}
       />
 
-      <SecurityFeatures />
+      {!report && <SecurityFeatures />}
 
       {report && (
         <SecurityReport report={report} onAnalyzeNew={handleAnalyzeNew} />
