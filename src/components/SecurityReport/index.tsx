@@ -12,7 +12,7 @@ interface SecurityReportProps {
 
 export const SecurityReport: React.FC<SecurityReportProps> = ({ report }) => {
   return (
-    <div className="space-y-6">
+    <div data-testid="security-report" className="space-y-6">
       <OverallScore report={report} />
       <WebsiteScreenshot url={report.url} />
       <ThreatDetection threats={report.threats} />
