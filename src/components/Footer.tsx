@@ -11,7 +11,10 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Shield className="h-6 w-6 text-blue-400" />
+              <Shield
+                data-testid="shield-icon"
+                className="h-6 w-6 text-blue-400"
+              />
               <span className="text-xl font-bold text-white">
                 {t("secureCheckTitle")}
               </span>
