@@ -28,11 +28,11 @@ export const ThreatDetection: React.FC<ThreatDetectionProps> = ({
             <span className="text-slate-300">{t("malwareDetection")}</span>
             {threats.malware.detected ? (
               <Badge className="text-red-400 bg-red-400/20">
-                {t("detected")}
+                <p className="w-full text-center">{t("detected")}</p>
               </Badge>
             ) : (
               <Badge className="text-green-400 bg-green-400/20">
-                {t("clean")}
+                <p className="w-full text-center">{t("clean")}</p>
               </Badge>
             )}
           </div>
@@ -41,11 +41,11 @@ export const ThreatDetection: React.FC<ThreatDetectionProps> = ({
             <span className="text-slate-300">{t("phishingAttempt")}</span>
             {threats.phishing.detected ? (
               <Badge className="text-red-400 bg-red-400/20">
-                {t("detected")}
+                <p className="w-full text-center">{t("detected")}</p>
               </Badge>
             ) : (
               <Badge className="text-green-400 bg-green-400/20">
-                {t("safe")}
+                <p className="w-full text-center">{t("safe")}</p>
               </Badge>
             )}
           </div>
@@ -54,11 +54,11 @@ export const ThreatDetection: React.FC<ThreatDetectionProps> = ({
             <span className="text-slate-300">{t("dataTheftRisk")}</span>
             {threats.dataTheft.detected ? (
               <Badge className="text-red-400 bg-red-400/20">
-                {t("highRisk")}
+                <p className="w-full text-center">{t("highRisk")}</p>
               </Badge>
             ) : (
               <Badge className="text-green-400 bg-green-400/20">
-                {t("lowRisk")}
+                <p className="w-full text-center">{t("lowRisk")}</p>
               </Badge>
             )}
           </div>
@@ -66,10 +66,12 @@ export const ThreatDetection: React.FC<ThreatDetectionProps> = ({
           <div className="flex items-center justify-between p-3 bg-slate-700 rounded-lg">
             <span className="text-slate-300">{t("maliciousCookies")}</span>
             {threats.maliciousCookies.detected ? (
-              <Badge className="text-red-400 bg-red-400/20">{t("found")}</Badge>
+              <Badge className="text-red-400 bg-red-400/20">
+                <p className="w-full text-center">{t("found")}</p>
+              </Badge>
             ) : (
               <Badge className="text-green-400 bg-green-400/20">
-                {t("none")}
+                <p className="w-full text-center">{t("none")}</p>
               </Badge>
             )}
           </div>

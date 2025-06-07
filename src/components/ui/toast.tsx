@@ -117,7 +117,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               </p>
             )}
             {toasts.message && (
-              <p className="text-sm font-normal line-clamp-2">
+              <p className="text-sm font-normal text-wrap line-clamp-2">
                 {toasts.message}
               </p>
             )}
