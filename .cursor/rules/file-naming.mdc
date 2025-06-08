@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+file names should be written in Camel Case, names of files that generate components should be written in Upper Camel Case

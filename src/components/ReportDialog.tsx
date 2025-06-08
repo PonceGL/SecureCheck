@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,12 +7,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Flag } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/hooks/useLanguage';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Flag } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ReportDialogProps {
   url: string;
@@ -21,9 +20,9 @@ interface ReportDialogProps {
 
 export const ReportDialog: React.FC<ReportDialogProps> = ({ url }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [explanation, setExplanation] = useState('');
+  const [explanation, setExplanation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { show } = useToast();
   const { t } = useLanguage();
 
   const handleSubmit = async () => {
@@ -32,35 +31,40 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({ url }) => {
     }
 
     setIsSubmitting(true);
-    
+
     // Simulate API call to submit report
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Report submitted for URL:', url, 'Explanation:', explanation);
-    
-    toast({
-      title: t('reportSubmitted'),
-      description: `Report for ${url} has been submitted for review.`,
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    show({
+      type: "error",
+      title: "Error",
+      message: "No se pudo generar el reporte",
     });
-    
+
     setIsOpen(false);
-    setExplanation('');
+    setExplanation("");
     setIsSubmitting(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="text-orange-400 border-orange-400 hover:bg-orange-400/10">
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-orange-400 border-orange-400 hover:bg-orange-400/10"
+        >
           <Flag className="h-4 w-4 mr-2" />
-          {t('reportResult')}
+          {t("reportResult")}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-slate-800 border-slate-700 text-white">
         <DialogHeader>
-          <DialogTitle className="text-white">{t('disagreeWithResult')}</DialogTitle>
+          <DialogTitle className="text-white">
+            {t("disagreeWithResult")}
+          </DialogTitle>
           <DialogDescription className="text-slate-300">
-            {t('explainDisagreement')}
+            {t("explainDisagreement")}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -78,14 +82,14 @@ export const ReportDialog: React.FC<ReportDialogProps> = ({ url }) => {
             onClick={() => setIsOpen(false)}
             className="text-slate-300 border-slate-600 hover:bg-slate-700"
           >
-            {t('cancel')}
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={!explanation.trim() || isSubmitting}
             className="bg-orange-600 hover:bg-orange-700 text-white"
           >
-            {isSubmitting ? 'Submitting...' : t('submitReport')}
+            {isSubmitting ? "Submitting..." : t("submitReport")}
           </Button>
         </DialogFooter>
       </DialogContent>
